@@ -1,10 +1,20 @@
+import csv
 import logging
 import os
+import time
 
 
 from decouple import config
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
+
+URL = 'http://divulgacandcontas.tse.jus.br/divulga/#/candidato/{ano}/{end}/'\
+       '{cod_mun}/{sq_cand}'
+
+
+def read_csv(file_name):
+    fobj = open(file_name, newline='')
+    return csv.DictReader(fobj)
 
 
 def config_logging():
@@ -31,3 +41,11 @@ if __name__ == "__main__":
         executable_path=exec_path
     )
     logging.info("Navegador pronto")
+
+    politicians = read_csv('governantes-rj.csv')
+    # Build url
+    for politician in politicians:
+        url = URL.format(**politician)
+        logging.info("Buscando url: %s" % url)
+        browser.get(url)
+        time.sleep(3)
